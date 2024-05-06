@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace ExploreRussiaWebApp.Models;
+namespace ExploreRussia.Domain.Model;
 
-public partial class ExploreRussiaDbContext : DbContext
+public partial class ExploreRussiaContext : DbContext
 {
-    public ExploreRussiaDbContext()
+    public ExploreRussiaContext()
     {
     }
 
-    public ExploreRussiaDbContext(DbContextOptions<ExploreRussiaDbContext> options)
+    public ExploreRussiaContext(DbContextOptions<ExploreRussiaContext> options)
         : base(options)
     {
     }
@@ -47,7 +47,6 @@ public partial class ExploreRussiaDbContext : DbContext
         {
             entity.ToTable("Guide");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Email).HasMaxLength(50);
             entity.Property(e => e.FirstName).HasMaxLength(50);
             entity.Property(e => e.LastName).HasMaxLength(50);
@@ -64,7 +63,6 @@ public partial class ExploreRussiaDbContext : DbContext
         {
             entity.ToTable("Order");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.TripId).HasColumnName("TripID");
             entity.Property(e => e.UserId).HasColumnName("UserID");
@@ -84,7 +82,6 @@ public partial class ExploreRussiaDbContext : DbContext
         {
             entity.ToTable("Review");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Comment).HasMaxLength(500);
 
             entity.HasOne(d => d.Trip).WithMany(p => p.Reviews)
@@ -110,7 +107,6 @@ public partial class ExploreRussiaDbContext : DbContext
         {
             entity.ToTable("Trip");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.GuideId).HasColumnName("GuideID");
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.TripName).HasMaxLength(50);

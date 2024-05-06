@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ExploreRussiaWebApp.Models;
+namespace ExploreRussia.Domain.Models;
 
 public partial class Guide
 {
