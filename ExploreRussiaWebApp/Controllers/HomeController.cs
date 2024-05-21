@@ -26,20 +26,28 @@ namespace ExploreRussiaWebApp.Controllers
             return View(trips);
         }
 
-        public IActionResult Guides()
-        {
-            return View();
-        }
 
         public IActionResult Privacy()
         {
             return View();
         }
 
+        public IActionResult Guides()
+        {
+            return RedirectToAction("Index", "Guide");
+        }
+
+        public IActionResult Trips()
+        {
+            return RedirectToAction("Index", "Trip");
+        }
+
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }
