@@ -4,15 +4,29 @@
     ViewData["Title"] = "Главная страница";
     }
 
-    <h1>Доступные походы</h1>
-    @foreach (var trip in Model)
-{
-    <div>
-        <h2>@trip.TripName</h2>
-        <p>@trip.Description</p>
-        <p>Цена: @trip.Price</p>
-        <p>Дата начала: @trip.StartDate</p>
-        <p>Дата конца: @trip.EndDate</p>
-        <a asp-action="BookTrip" asp-route-id="@trip.Id">Book Now</a>
+<h1 class="my-4 text-center">Доступные походы</h1>
+
+    <div class="row">
+        @foreach (var trip in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">@trip.TripName</h4>
+                        <p class="card-text">@trip.Description</p>
+                        <p class="card-text">
+                            <strong>Цена:</strong> @string.Format(CultureInfo.InvariantCulture, "{0:C}", trip.Price)
+                        </p>
+                        <p class="card-text">
+                            <strong>Дата начала:</strong> @trip?.StartDate.Value.ToShortDateString()
+                        </p>
+                        <p class="card-text">
+                        <strong>Дата конца:</strong> @trip?.EndDate.Value.ToShortDateString()
+                        </p>
+                        <a href="@Url.Action("BookTrip", new { id = trip.Id })" class="btn btn-primary">Забронировать</a>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-}
+

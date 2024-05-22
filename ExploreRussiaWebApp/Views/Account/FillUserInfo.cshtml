@@ -1,45 +1,45 @@
-﻿@model ExploreRussia.Domain.Models.User
+﻿@model ExploreRussiaWebApp.Models.Account.FillUserViewModel
 
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Заполнение информации о пользователе</title>
+@{
+    ViewData["Title"] = "Заполнение информации о пользователе";
+}
 
-    <!-- Ваши стили и скрипты -->
-</head>
-<body>
-    <div class="container">
-        <h2>Заполните информацию о себе</h2>
-        <form asp-action="FillUserInfo" method="post">
-            <div class="form-group">
-                <label asp-for="LastName">Фамилия</label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FirstName">Имя</label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Patronymic">Отчество</label>
-                <input asp-for="Patronymic" class="form-control" />
-                <span asp-validation-for="Patronymic" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Phone">Телефон</label>
-                <input asp-for="Phone" class="form-control" />
-                <span asp-validation-for="Phone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email">Email</label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-        </form>
+<h1>Заполнение информации о пользователе</h1>
+
+@if (TempData["UserInfoSaved"] != null)
+{
+    <div class="alert alert-success alert-dismissible" role="alert">
+        Информация о пользователе успешно сохранена!
     </div>
-</body>
-</html>
+    TempData["UserInfoSaved"] = null;
+}
+
+<form asp-action="FillUserInfo">
+    <div class="form-group">
+        <label asp-for="LastName" class="control-label"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="FirstName" class="control-label"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Patronymic" class="control-label"></label>
+        <input asp-for="Patronymic" class="form-control" />
+        <span asp-validation-for="Patronymic" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone" class="control-label"></label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Сохранить" class="btn btn-primary" />
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,48 @@
+﻿@model ExploreRussia.Domain.Models.Order
+
+@{
+    ViewData["Title"] = "Создание заявки";
+}
+
+<h1>Создание заявки</h1>
+
+@if (TempData["OrderSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible" role="alert">
+        @TempData["OrderSuccess"]
+    </div>
+}
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Trip.TripName" class="control-label">Поход</label>
+        <input asp-for="Trip.TripName" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="User.LastName" class="control-label">Фамилия</label>
+        <input asp-for="User.LastName" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="User.FirstName" class="control-label">Имя</label>
+        <input asp-for="User.FirstName" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="User.Patronymic" class="control-label">Отчество</label>
+        <input asp-for="User.Patronymic" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="OrderDate" class="control-label">Дата заявки</label>
+        <input asp-for="OrderDate" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label asp-for="TotalAmount" class="control-label">Итоговая сумма</label>
+        <input asp-for="TotalAmount" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Подать заявку" class="btn btn-primary" />
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -31,30 +31,32 @@ namespace ExploreRussiaWebApp.Controllers
         {
             return View();
         }
-        //[HttpPost]
-        //public async Task<IActionResult> FillUserInfo(User model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
-        //        if (user != null)
-        //        {
-        //            user.FirstName = model.FirstName;
-        //            user.LastName = model.LastName;
-        //            user.Patronymic = model.Patronymic;
-        //            user.Phone = model.Phone;
 
-        //            _context.Users.Update(user);
-        //            await _context.SaveChangesAsync();
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FillUserInfo(FillUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-        //            // Перенаправить пользователя на другую страницу после успешного сохранения
-        //            return RedirectToAction("Index", "Home");
-        //        }
-        //    }
+                user.LastName = model.LastName;
+                user.FirstName = model.FirstName;
+                user.Patronymic = model.Patronymic;
+                user.Phone = model.Phone;
 
-        //    // Если модель недействительна, вернуть представление с ошибками валидации
-        //    return View(model);
-        //}
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                TempData["UserInfoSaved"] = true;
+                return RedirectToAction("Index", "Home");
+            }
+            return View(model);
+        }
         private int GetCurrentUserId()
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
