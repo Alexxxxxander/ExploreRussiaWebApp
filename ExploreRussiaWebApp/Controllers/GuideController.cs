@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ExploreRussia.Domain.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExploreRussiaWebApp.Views
 {
@@ -20,6 +21,12 @@ namespace ExploreRussiaWebApp.Views
 
         // GET: Guide
         public async Task<IActionResult> Index()
+        {
+            var exploreRussiaContext = _context.Guides.Include(g => g.Gender);
+            return View(await exploreRussiaContext.ToListAsync());
+        }
+
+        public async Task<IActionResult> EditList()
         {
             var exploreRussiaContext = _context.Guides.Include(g => g.Gender);
             return View(await exploreRussiaContext.ToListAsync());
@@ -56,6 +63,7 @@ namespace ExploreRussiaWebApp.Views
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("Id,LastName,FirstName,Patronymic,Phone,Email,ExperienceYears,GenderId")] Guide guide)
         {
             if (ModelState.IsValid)
@@ -90,6 +98,7 @@ namespace ExploreRussiaWebApp.Views
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,LastName,FirstName,Patronymic,Phone,Email,ExperienceYears,GenderId")] Guide guide)
         {
             if (id != guide.Id)
