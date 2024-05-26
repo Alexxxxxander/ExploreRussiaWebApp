@@ -7,11 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExploreRussiaWebApp", "Expl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExploreRussia.Domain", "ExploreRussia.Domain\ExploreRussia.Domain.csproj", "{F9CB34D6-A15E-4F91-BEB4-18F6922438AC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{81D09577-86BE-47BF-BE08-8A506D6FBE42}"
-	ProjectSection(SolutionItems) = preProject
-		..\..\..\..\OneDrive\Документы\ПЗ_ДИПЛОМ.docx = ..\..\..\..\OneDrive\Документы\ПЗ_ДИПЛОМ.docx
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
