@@ -1,0 +1,24 @@
+﻿@model ExploreRussia.Domain.Models.Order
+
+@{
+    ViewData["Title"] = "Изменить цену заказа";
+}
+
+<h1>Изменить цену заказа</h1>
+
+<div>
+    <h3>Информация о заказе</h3>
+    <p>ФИО клиента: @Model.User.LastName @Model.User.FirstName @Model.User.Patronymic</p>
+    <p>Номер телефона: @Model.User.Phone</p>
+    <p>Электронная почта: @Model.User.Email</p>
+    <p>Название похода: @Model.Trip.TripName</p>
+</div>
+
+<form asp-action="EditOrder" method="post">
+    <div class="form-group">
+        <label for="totalAmount">Стоимость</label>
+        <input type="number" step="0.01" class="form-control" id="totalAmount" name="totalAmount" value="@Model.TotalAmount" required />
+    </div>
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>

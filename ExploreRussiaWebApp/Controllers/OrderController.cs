@@ -17,7 +17,8 @@ namespace ExploreRussiaWebApp.Controllers
             _context = context;
         }
 
-
+        [HttpGet]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(int tripId)
         {
             var userId = GetCurrentUserId();
@@ -35,7 +36,7 @@ namespace ExploreRussiaWebApp.Controllers
                 TotalAmount = 0m 
             };
 
-            await _context.AddAsync(order);
+            await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
 
             TempData["OrderSuccess"] = "Заявка успешно отправлена.";

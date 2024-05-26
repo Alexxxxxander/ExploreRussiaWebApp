@@ -31,7 +31,8 @@ public partial class User
 
     public virtual Role Role { get; set; } = null!;
 
-    public User(string email, string password) { 
+    public User(string email, string password)
+    {
         Email = email;
         Password = password;
         RoleId = 1;

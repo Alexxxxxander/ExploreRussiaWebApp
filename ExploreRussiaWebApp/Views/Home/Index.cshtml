@@ -23,7 +23,10 @@
                         <p class="card-text">
                         <strong>Дата конца:</strong> @trip?.EndDate.Value.ToShortDateString()
                         </p>
-                        <a href="@Url.Action("BookTrip", new { id = trip.Id })" class="btn btn-primary">Забронировать</a>
+                        <form asp-action="BookTrip" method="post">
+                            <input type="hidden" name="tripId" value="@trip.Id" />
+                            <button type="submit" class="btn btn-primary">Забронировать</button>
+                        </form>
                     </div>
                 </div>
             </div>

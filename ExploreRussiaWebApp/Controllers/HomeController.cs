@@ -42,8 +42,10 @@ namespace ExploreRussiaWebApp.Controllers
             return RedirectToAction("Index", "Trip");
         }
 
+        [HttpPost]
         [Authorize]
-        public async Task<IActionResult> BookTrip(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BookTrip(int tripId)
         {
             var user = await exploreRussiaContext.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
 
@@ -53,8 +55,32 @@ namespace ExploreRussiaWebApp.Controllers
                 return RedirectToAction("FillUserInfo", "Account");
             }
 
+            // Проверяем, есть ли уже заявка на этот поход, сделанная сегодня
+            var today = DateTime.UtcNow.Date;
+            var existingOrder = await exploreRussiaContext.Orders
+                .Where(o => o.UserId == user.Id && o.TripId == tripId && o.OrderDate.Date == today)
+                .FirstOrDefaultAsync();
+
+            if (existingOrder != null)
+            {
+                TempData["OrderError"] = "Вы уже подали заявку на этот поход сегодня.";
+                return RedirectToAction("Index", "Home");
+            }
+
             // Пользователь уже имеет необходимую информацию, переходим к созданию заказа
-            return RedirectToAction("Create", "Order", new { tripId = id });
+            Order order = new()
+            {
+                UserId = user.Id,
+                TripId = tripId,
+                OrderDate = DateTime.UtcNow,
+                TotalAmount = 0m
+            };
+
+            await exploreRussiaContext.Orders.AddAsync(order);
+            await exploreRussiaContext.SaveChangesAsync();
+
+            TempData["OrderSuccess"] = "Заявка успешно отправлена.";
+            return RedirectToAction("Index", "Home");
         }
 
         // Метод для получения ID текущего пользователя
