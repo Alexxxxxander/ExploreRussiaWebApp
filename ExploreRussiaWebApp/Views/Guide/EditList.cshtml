@@ -1,10 +1,8 @@
 ﻿@model IEnumerable<ExploreRussia.Domain.Models.Guide>
 
 @{
-    ViewData["Title"] = "EditList";
+    ViewData["Title"] = "Гиды";
 }
-
-<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Создать</a>
@@ -62,9 +60,9 @@
                     @Html.DisplayFor(modelItem => item.Gender.Name)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Редактировать</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Детали</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
                 </td>
             </tr>
         }

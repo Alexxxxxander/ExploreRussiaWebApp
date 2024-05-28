@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ExploreRussia.Domain.Models;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExploreRussiaWebApp.Controllers
 {
@@ -56,32 +57,42 @@ namespace ExploreRussiaWebApp.Controllers
             return View();
         }
 
+        private bool IsValidImageExtension(string fileName)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg" };
+            string extension = Path.GetExtension(fileName).ToLowerInvariant();
+            return allowedExtensions.Contains(extension);
+        }
+
         // POST: Trip/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile imageFile)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([Bind("TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile imageFile)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(trip);
-                await _context.SaveChangesAsync();
-
-                if (imageFile != null)
+                if (imageFile != null && imageFile.Length > 0)
                 {
-                    string wwwRootPath = _webHostEnvironment.WebRootPath;
-                    string fileName = $"{trip.Id}.jpg"; // Нумерация по ID тура
-                    string path = Path.Combine(wwwRootPath + "/images/", fileName);
+                    if (!IsValidImageExtension(imageFile.FileName))
+                    {
+                        ModelState.AddModelError("", "Допустимы только файлы с расширениями .jpg или .jpeg.");
+                        ViewData["GuideId"] = new SelectList(_context.Guides, "Id", "Email");
+                        return View(trip);
+                    }
 
-                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    var id = await _context.Trips.MaxAsync(g => (int?)g.Id) ?? 0 + 1;
+                    var fileName = "trip" + id + Path.GetExtension(imageFile.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await imageFile.CopyToAsync(fileStream);
                     }
-
-                    trip.ImageUrl = "/images/trip" + fileName;
-                    _context.Update(trip);
-                    await _context.SaveChangesAsync();
+                    trip.ImageUrl = "/images/" + fileName;
                 }
 
+                _context.Add(trip);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GuideId"] = new SelectList(_context.Guides, "Id", "Email", trip.GuideId);
@@ -108,6 +119,7 @@ namespace ExploreRussiaWebApp.Controllers
         // POST: Trip/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile imageFile)
         {
             if (id != trip.Id)
@@ -117,41 +129,33 @@ namespace ExploreRussiaWebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (imageFile != null && imageFile.Length > 0)
                 {
-                    if (imageFile != null)
+                    if (!IsValidImageExtension(imageFile.FileName))
                     {
-                        string wwwRootPath = _webHostEnvironment.WebRootPath;
-                        string fileName = $"{trip.Id}.jpg"; // Нумерация по ID тура
-                        string path = Path.Combine(wwwRootPath + "/images/trip", fileName);
-
-                        using (var fileStream = new FileStream(path, FileMode.Create))
-                        {
-                            await imageFile.CopyToAsync(fileStream);
-                        }
-
-                        trip.ImageUrl = "/images/" + fileName;
+                        ModelState.AddModelError("", "Допустимы только файлы с расширениями .jpg или .jpeg.");
+                        ViewData["GuideId"] = new SelectList(_context.Guides, "Id", "Email", trip.GuideId);
+                        return View(trip);
                     }
 
-                    _context.Update(trip);
-                    await _context.SaveChangesAsync();
+                    var fileName = "trip" + trip.Id + Path.GetExtension(imageFile.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(fileStream);
+                    }
+                    trip.ImageUrl = "/images/" + fileName;
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TripExists(trip.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
+                _context.Update(trip);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GuideId"] = new SelectList(_context.Guides, "Id", "Email", trip.GuideId);
             return View(trip);
         }
+
+
 
         // GET: Trip/Delete/5
         public async Task<IActionResult> Delete(int? id)

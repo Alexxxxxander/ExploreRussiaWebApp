@@ -58,19 +58,47 @@ namespace ExploreRussiaWebApp.Views
             return View();
         }
 
+        private bool IsValidImageExtension(string fileName)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg" };
+            string extension = Path.GetExtension(fileName).ToLowerInvariant();
+            return allowedExtensions.Contains(extension);
+        }
+
         // POST: Guide/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("Id,LastName,FirstName,Patronymic,Phone,Email,ExperienceYears,GenderId")] Guide guide)
+        public async Task<IActionResult> Create([Bind("LastName,FirstName,Patronymic,Phone,Email,ExperienceYears,GenderId,ImageUrl, Gender")] Guide guide, IFormFile? uploadedFile)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(guide);
+                ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
+
+                if (uploadedFile != null && uploadedFile.Length > 0)
+                {
+                    if (!IsValidImageExtension(uploadedFile.FileName))
+                    {
+                        ModelState.AddModelError("", "Допустимы только файлы с расширениями .jpg или .jpeg.");
+                        ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name");
+                        return View(guide);
+                    }
+
+                    var id = await _context.Guides.MaxAsync(g => (int?)g.Id) ?? 0 + 1;
+                    var fileName = "guide" + id + Path.GetExtension(uploadedFile.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await uploadedFile.CopyToAsync(fileStream);
+                    }
+                    guide.ImageUrl = "/images/" + fileName;
+                }
+                ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
+                await _context.AddAsync(guide);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(EditList));
             }
             ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
             return View(guide);
@@ -99,7 +127,7 @@ namespace ExploreRussiaWebApp.Views
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,LastName,FirstName,Patronymic,Phone,Email,ExperienceYears,GenderId")] Guide guide)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,LastName,FirstName,Patronymic,Phone,Email,ExperienceYears,GenderId, Gender")] Guide guide, IFormFile uploadedFile)
         {
             if (id != guide.Id)
             {
@@ -108,27 +136,32 @@ namespace ExploreRussiaWebApp.Views
 
             if (ModelState.IsValid)
             {
-                try
+                if (uploadedFile != null && uploadedFile.Length > 0)
                 {
-                    _context.Update(guide);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GuideExists(guide.Id))
+                    if (!IsValidImageExtension(uploadedFile.FileName))
                     {
-                        return NotFound();
+                        ModelState.AddModelError("", "Допустимы только файлы с расширениями .jpg или .jpeg.");
+                        ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
+                        return View(guide);
                     }
-                    else
+
+                    var fileName = "guide" + guide.Id + Path.GetExtension(uploadedFile.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        throw;
+                        await uploadedFile.CopyToAsync(fileStream);
                     }
+                    guide.ImageUrl = "/images/" + fileName;
                 }
+
+                _context.Update(guide);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
             return View(guide);
         }
+
 
         // GET: Guide/Delete/5
         public async Task<IActionResult> Delete(int? id)

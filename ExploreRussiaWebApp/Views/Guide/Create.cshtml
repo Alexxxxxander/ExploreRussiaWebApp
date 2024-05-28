@@ -1,22 +1,32 @@
 ﻿@model ExploreRussia.Domain.Models.Guide
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Создание";
 }
 
-<h1>Create</h1>
+<h1>Создание</h1>
 
-<h4>Guide</h4>
+<h4>Гид</h4>
 <hr />
 <div class="row">
+    @if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            }
+        </ul>
+    </div>
+}
+
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="LastName" class="control-label"></label>
                 <input asp-for="LastName" class="form-control" />
@@ -50,16 +60,21 @@
             <div class="form-group">
                 <label asp-for="GenderId" class="control-label"></label>
                 <select asp-for="GenderId" class ="form-control" asp-items="ViewBag.GenderId"></select>
+                <span asp-validation-for="GenderId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <label asp-for="ImageUrl">Фотография</label>
+                <input type="file" asp-for="ImageUrl" class="form-control" />
+            </div>
+            <div class="form-group" style="margin: 10px">
+                <button type="submit" class="btn btn-primary">Создать</button>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="EditList">Назад к списку</a>
 </div>
 
 @section Scripts {

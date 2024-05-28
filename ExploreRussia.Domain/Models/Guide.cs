@@ -19,9 +19,11 @@ public partial class Guide
 
     public int ExperienceYears { get; set; }
 
-    public int GenderId { get; set; }
+    public int? GenderId { get; set; }
 
-    public virtual Gender Gender { get; set; } = null!;
+    public string? ImageUrl { get; set; }
+
+    public virtual Gender? Gender { get; set; } = null!;
 
     public virtual ICollection<Trip> Trips { get; set; } = new List<Trip>();
 }

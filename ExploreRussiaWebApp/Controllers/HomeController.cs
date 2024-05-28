@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Security.Claims;
+using ExploreRussiaWebApp.Models.Home;
+using System;
+
 
 namespace ExploreRussiaWebApp.Controllers
 {
@@ -23,8 +26,11 @@ namespace ExploreRussiaWebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            var guides = await exploreRussiaContext.Guides.ToListAsync();
             var trips = await exploreRussiaContext.Trips.ToListAsync();
-            return View(trips);
+            var model = new HomeViewModel(guides, trips);
+              
+            return View(model);
         }
 
         public IActionResult Privacy()
@@ -41,6 +47,51 @@ namespace ExploreRussiaWebApp.Controllers
         {
             return RedirectToAction("Index", "Trip");
         }
+        [Authorize]
+        public async  Task<IActionResult> User(User model) 
+        {
+            var userId = GetCurrentUserId();
+            var user = await exploreRussiaContext.Users.Include(u => u.Orders)
+                                                       .ThenInclude(o => o.Trip)
+                                                       .FirstOrDefaultAsync(u => u.Id == userId);
+            return View(user);
+        }
+        public async Task<IActionResult> Profile()
+        {
+            var userId = GetCurrentUserId();
+            var user = await exploreRussiaContext.Users.Include(u => u.Orders)
+                                                       .ThenInclude(o => o.Trip)
+                                                       .FirstOrDefaultAsync(u => u.Id == userId);
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile(User model)
+        {
+            var userId = GetCurrentUserId;
+            var user = await exploreRussiaContext.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.Phone = model.Phone;
+                await exploreRussiaContext.SaveChangesAsync();
+            }
+            return RedirectToAction("Profile");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelOrder(int orderId)
+        {
+            var order = await exploreRussiaContext.Orders.FindAsync(orderId);
+            if (order != null && order.UserId == GetCurrentUserId())
+            {
+                order.Status = "Canceled";
+                await exploreRussiaContext.SaveChangesAsync();
+            }
+            return RedirectToAction("Profile");
+        }
+
 
         [HttpPost]
         [Authorize]

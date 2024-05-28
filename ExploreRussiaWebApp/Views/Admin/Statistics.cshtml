@@ -1,0 +1,23 @@
+﻿@model List<ExploreRussia.Domain.Models.Trip>
+
+<h2>Статистика заявок</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Поход</th>
+            <th>Количество заявок</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var trip in Model)
+        {
+            <tr>
+                <td>@trip.TripName</td>
+                <td>@trip.Orders.Count</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<form asp-action="ExportToExcel" method="post">
+    <button type="submit" class="btn btn-primary">Экспорт в Excel</button>
+</form>

@@ -15,6 +15,8 @@ public partial class Order
 
     public decimal TotalAmount { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual Trip Trip { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;

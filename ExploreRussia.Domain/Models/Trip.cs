@@ -28,4 +28,6 @@ public partial class Trip
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+    //среднее значение рейтинга
+    public double AverageRating => Reviews.Any() ? Reviews.Average(r => r.Rating) : 0;
 }

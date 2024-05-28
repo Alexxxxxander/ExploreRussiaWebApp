@@ -57,7 +57,11 @@ namespace ExploreRussiaWebApp.Controllers
             }
             return View(model);
         }
-        private int GetCurrentUserId()
+        /// <summary>
+        /// Метод возвращает Id текущего пользователя
+        /// </summary>
+        /// <returns>int i</returns>
+        public int GetCurrentUserId()
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
