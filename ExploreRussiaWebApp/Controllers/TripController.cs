@@ -2,20 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ExploreRussia.Domain.Models;
+using System.IO;
 
 namespace ExploreRussiaWebApp.Controllers
 {
     public class TripController : Controller
     {
         private readonly ExploreRussiaContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public TripController(ExploreRussiaContext context)
+        public TripController(ExploreRussiaContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Trip
@@ -52,16 +57,31 @@ namespace ExploreRussiaWebApp.Controllers
         }
 
         // POST: Trip/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip)
+        public async Task<IActionResult> Create([Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile imageFile)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(trip);
                 await _context.SaveChangesAsync();
+
+                if (imageFile != null)
+                {
+                    string wwwRootPath = _webHostEnvironment.WebRootPath;
+                    string fileName = $"{trip.Id}.jpg"; // Нумерация по ID тура
+                    string path = Path.Combine(wwwRootPath + "/images/", fileName);
+
+                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(fileStream);
+                    }
+
+                    trip.ImageUrl = "/images/trip" + fileName;
+                    _context.Update(trip);
+                    await _context.SaveChangesAsync();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GuideId"] = new SelectList(_context.Guides, "Id", "Email", trip.GuideId);
@@ -86,11 +106,9 @@ namespace ExploreRussiaWebApp.Controllers
         }
 
         // POST: Trip/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile imageFile)
         {
             if (id != trip.Id)
             {
@@ -101,6 +119,20 @@ namespace ExploreRussiaWebApp.Controllers
             {
                 try
                 {
+                    if (imageFile != null)
+                    {
+                        string wwwRootPath = _webHostEnvironment.WebRootPath;
+                        string fileName = $"{trip.Id}.jpg"; // Нумерация по ID тура
+                        string path = Path.Combine(wwwRootPath + "/images/trip", fileName);
+
+                        using (var fileStream = new FileStream(path, FileMode.Create))
+                        {
+                            await imageFile.CopyToAsync(fileStream);
+                        }
+
+                        trip.ImageUrl = "/images/" + fileName;
+                    }
+
                     _context.Update(trip);
                     await _context.SaveChangesAsync();
                 }

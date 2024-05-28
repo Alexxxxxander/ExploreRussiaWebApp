@@ -36,3 +36,53 @@ body {
         display: none;
     }
 }
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.jumbotron {
+    background: url(/images/hero.jpg) no-repeat center center;
+    background-size: cover;
+    color: white;
+    padding: 100px 25px;
+}
+
+    .jumbotron .container {
+        background-color: rgba(0, 0, 0, 0.6);
+        padding: 20px;
+        border-radius: 5px;
+    }
+
+    .jumbotron .display-4 {
+        font-size: 3.5rem;
+    }
+
+.card {
+    border: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+    .card:hover {
+        transform: translateY(-10px);
+    }
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+    position: relative;
+    width: 100%;
+    bottom: 0;
+}

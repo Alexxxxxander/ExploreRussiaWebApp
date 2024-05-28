@@ -4,13 +4,22 @@
     ViewData["Title"] = "Главная страница";
     }
 
-<h1 class="my-4 text-center">Доступные походы</h1>
+    <div class="jumbotron jumbotron-fluid text-center">
+        <div class="container">
+            <h1 class="display-4">Добро пожаловать в Explore Russia</h1>
+            <p class="lead">Ваш гид по незабываемым приключениям по всей России.</p>
+            <a class="btn btn-primary btn-lg" href="@Url.Action("Trips", "Home")" role="button">Исследовать походы</a>
+        </div>
+    </div>
 
-    <div class="row">
-        @foreach (var trip in Model)
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Доступные походы</h1>
+        <div class="row">
+            @foreach (var trip in Model)
         {
             <div class="col-md-4 mb-4">
-                <div class="card">
+                <div class="card h-100">
+                    <img src="@trip.ImageUrl" class="card-img-top" alt="@trip.TripName">
                     <div class="card-body">
                         <h4 class="card-title">@trip.TripName</h4>
                         <p class="card-text">@trip.Description</p>
@@ -21,15 +30,26 @@
                             <strong>Дата начала:</strong> @trip?.StartDate.Value.ToShortDateString()
                         </p>
                         <p class="card-text">
-                        <strong>Дата конца:</strong> @trip?.EndDate.Value.ToShortDateString()
+                            <strong>Дата конца:</strong> @trip?.EndDate.Value.ToShortDateString()
                         </p>
                         <form asp-action="BookTrip" method="post">
                             <input type="hidden" name="tripId" value="@trip.Id" />
-                            <button type="submit" class="btn btn-primary">Забронировать</button>
+                            <button type="submit" class="btn btn-primary">Купить место</button>
                         </form>
                     </div>
                 </div>
             </div>
         }
+        </div>
     </div>
 
+    <div class="container mt-5">
+        <h2>О нас</h2>
+        <p>Компания Explore Russia специализируется на организации туров по самым красивым и интересным местам России. Мы предлагаем уникальные маршруты, профессиональных гидов и незабываемые впечатления.</p>
+    </div>
+
+    <footer class="bg-light text-center text-lg-start mt-5">
+        <div class="text-center p-3">
+            © 2024 Explore Russia
+        </div>
+    </footer>

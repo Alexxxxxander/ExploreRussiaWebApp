@@ -57,7 +57,7 @@ namespace ExploreRussiaWebApp.Controllers
             await _context.SaveChangesAsync();
 
             TempData["OrderUpdated"] = "Стоимость заказа успешно обновлена.";
-            return RedirectToAction("AdminPanel", "Index");
+            return RedirectToAction("Admin", "Index");
         }
     }
 }

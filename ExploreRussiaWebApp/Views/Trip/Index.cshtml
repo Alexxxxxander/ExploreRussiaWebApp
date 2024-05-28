@@ -1,71 +1,66 @@
 ﻿@model IEnumerable<ExploreRussia.Domain.Models.Trip>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Список походов";
 }
 
-<h1>Index</h1>
+<h1>Список походов</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Создать новый поход</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.TripName)
+                Название похода
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                Описание
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.StartDate)
+                Цена
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EndDate)
+                Дата начала
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                Дата окончания
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.MaxParticipants)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Guide)
+                Изображение
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TripName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MaxParticipants)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Guide.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TripName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td>
+                    <img src="@item.ImageUrl" alt="@item.TripName" class="img-thumbnail" style="max-width: 100px;" />
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Редактировать</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Детали</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Удалить</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
