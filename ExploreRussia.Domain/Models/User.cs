@@ -37,4 +37,8 @@ public partial class User
         Password = password;
         RoleId = 1;
     }
+    public User()
+    {
+
+    }
 }

@@ -47,8 +47,9 @@ namespace ExploreRussiaWebApp.Controllers
         {
             return RedirectToAction("Index", "Trip");
         }
+
         [Authorize]
-        public async  Task<IActionResult> User(User model) 
+        public async  Task<IActionResult> UserProfile(User model) 
         {
             var userId = GetCurrentUserId();
             var user = await exploreRussiaContext.Users.Include(u => u.Orders)
@@ -56,14 +57,7 @@ namespace ExploreRussiaWebApp.Controllers
                                                        .FirstOrDefaultAsync(u => u.Id == userId);
             return View(user);
         }
-        public async Task<IActionResult> Profile()
-        {
-            var userId = GetCurrentUserId();
-            var user = await exploreRussiaContext.Users.Include(u => u.Orders)
-                                                       .ThenInclude(o => o.Trip)
-                                                       .FirstOrDefaultAsync(u => u.Id == userId);
-            return View(user);
-        }
+
 
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(User model)
@@ -75,9 +69,18 @@ namespace ExploreRussiaWebApp.Controllers
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.Phone = model.Phone;
+                user.Email = model.Email;
+
+                exploreRussiaContext.Update(user);
                 await exploreRussiaContext.SaveChangesAsync();
             }
-            return RedirectToAction("Profile");
+            return RedirectToAction("UserProfile");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SumbitReview(Review review)
+        {
+            return RedirectToAction("UserProfile");
         }
 
         [HttpPost]
@@ -89,8 +92,10 @@ namespace ExploreRussiaWebApp.Controllers
                 order.Status = "Canceled";
                 await exploreRussiaContext.SaveChangesAsync();
             }
-            return RedirectToAction("Profile");
+            return RedirectToAction("UserProfile");
         }
+
+
 
 
         [HttpPost]
