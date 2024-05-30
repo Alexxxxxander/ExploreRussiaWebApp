@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ExploreRussiaWebApp</title>
+    <title>@ViewData["Title"] - ExploreRussia</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
@@ -17,14 +17,14 @@
                     if (User.IsInRole("Admin"))
                     {
                         <a class="navbar-brand" asp-area="" asp-controller="Admin" asp-action="Index">
-                            <img src="~/images/logo-icon.png" alt="Explore Russia" width="40" height="40" class="d-inline-block align-top">
+                            <img src="~/images/logo-icon.png" alt="Explore Russia" width="40" height="40" class="d-inline-block align-center">
                             Explore Russia
                         </a>
                     }
                     else
                     {
                         <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                            <img src="~/images/logo-icon.png" alt="Explore Russia" width="40" height="40" class="d-inline-block align-top">
+                            <img src="~/images/logo-icon.png" alt="Explore Russia" width="40" height="40" class="d-inline-block align-center">
                             Explore Russia
                         </a>                    
                     }
@@ -100,7 +100,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - ExploreRussiaWebApp
+            &copy; 2024 - ExploreRussia
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

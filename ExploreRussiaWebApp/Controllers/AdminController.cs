@@ -27,12 +27,9 @@ namespace ExploreRussiaWebApp.Controllers
 
         public async Task<IActionResult> Statistics()
         {
-            var orders = await _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.Trip)
-                .ToListAsync();
-
-            return View(orders);
+            var trips = await _context.Trips.Include(t => t.Orders).ToListAsync();
+                
+            return View(trips);
         }
         [HttpGet]
         [Authorize(Roles = "Admin")]
@@ -67,7 +64,7 @@ namespace ExploreRussiaWebApp.Controllers
             await _context.SaveChangesAsync();
 
             TempData["OrderUpdated"] = "Стоимость заказа успешно обновлена.";
-            return RedirectToAction("Admin", "Index");
+            return RedirectToAction("Index", "Admin");
         }
 
 
@@ -75,6 +72,9 @@ namespace ExploreRussiaWebApp.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ExportToExcel()
         {
+            // Установка лицензионного контекста
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             var trips = await _context.Trips.Include(t => t.Orders).ToListAsync();
 
             var stream = new MemoryStream();
@@ -88,7 +88,7 @@ namespace ExploreRussiaWebApp.Controllers
                 package.Save();
             }
             stream.Position = 0;
-            string excelName = $"Trip-Statistics-{DateTime.Now.ToString("yyyyMMddHHmmss")}.xlsx";
+            string excelName = $"Trip-Statistics-{DateTime.Now:yyyyMMddHHmmss}.xlsx";
 
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelName);
         }

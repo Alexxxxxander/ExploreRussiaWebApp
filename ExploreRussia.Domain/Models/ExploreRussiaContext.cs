@@ -30,8 +30,7 @@ public partial class ExploreRussiaContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=AlexLaptop;Database=ExploreRussiaDB;TrustServerCertificate=True;Encrypt=false;user id=sql_login;password=A!s3d5f7;MultipleActiveResultSets=True");
+        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:Default");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,6 +48,7 @@ public partial class ExploreRussiaContext : DbContext
 
             entity.Property(e => e.Email).HasMaxLength(50);
             entity.Property(e => e.FirstName).HasMaxLength(50);
+            entity.Property(e => e.ImageUrl).HasMaxLength(255);
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.Patronymic).HasMaxLength(50);
             entity.Property(e => e.Phone).HasMaxLength(50);
@@ -63,13 +63,13 @@ public partial class ExploreRussiaContext : DbContext
         {
             entity.ToTable("Order");
 
+            entity.Property(e => e.Status).HasMaxLength(50);
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.TripId).HasColumnName("TripID");
             entity.Property(e => e.UserId).HasColumnName("UserID");
 
             entity.HasOne(d => d.Trip).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.TripId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Order_Trip");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
@@ -108,6 +108,7 @@ public partial class ExploreRussiaContext : DbContext
             entity.ToTable("Trip");
 
             entity.Property(e => e.GuideId).HasColumnName("GuideID");
+            entity.Property(e => e.ImageUrl).HasMaxLength(255);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.TripName).HasMaxLength(50);
 

@@ -136,6 +136,12 @@ namespace ExploreRussiaWebApp.Views
 
             if (ModelState.IsValid)
             {
+                var existingGuide = await _context.Guides.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
+                if (existingGuide == null)
+                {
+                    return NotFound();
+                }
+
                 if (uploadedFile != null && uploadedFile.Length > 0)
                 {
                     if (!IsValidImageExtension(uploadedFile.FileName))
@@ -152,6 +158,11 @@ namespace ExploreRussiaWebApp.Views
                         await uploadedFile.CopyToAsync(fileStream);
                     }
                     guide.ImageUrl = "/images/" + fileName;
+                }
+                else
+                {
+                    // Если файл изображения не был загружен, сохранить старое значение ImageUrl
+                    guide.ImageUrl = existingGuide.ImageUrl;
                 }
 
                 _context.Update(guide);

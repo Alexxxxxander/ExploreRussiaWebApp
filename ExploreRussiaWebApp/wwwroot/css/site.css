@@ -20,6 +20,12 @@ body {
 .navbar {
     margin-bottom: 20px;
 }
+.navbar-brand {
+    margin-top: auto;
+    margin-bottom: auto;
+    align-content: center;
+    align-items:baseline;
+}
 
 .jumbotron {
     position: relative;
@@ -140,6 +146,63 @@ footer {
         display: none;
     }
 }
+.form-control-file {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+    .form-control-file:hover {
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-control-file:focus {
+        color: #495057;
+        background-color: #fff;
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .form-control-file input[type="file"] {
+        display: none;
+    }
+
+    .form-control-file label {
+        display: inline-block;
+        margin: 0;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #fff;
+        background-color: #007bff;
+        border: 1px solid #007bff;
+        border-radius: 0.25rem;
+        transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        cursor: pointer;
+    }
+
+        .form-control-file label:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+    .form-control-file span {
+        margin-left: 10px;
+        font-size: 1rem;
+    }
+
 
 
 

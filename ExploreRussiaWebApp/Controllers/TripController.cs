@@ -116,11 +116,10 @@ namespace ExploreRussiaWebApp.Controllers
             return View(trip);
         }
 
-        // POST: Trip/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile imageFile)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId,ImageUrl")] Trip trip, IFormFile imageFile)
         {
             if (id != trip.Id)
             {
@@ -129,6 +128,12 @@ namespace ExploreRussiaWebApp.Controllers
 
             if (ModelState.IsValid)
             {
+                var existingTrip = await _context.Trips.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id);
+                if (existingTrip == null)
+                {
+                    return NotFound();
+                }
+
                 if (imageFile != null && imageFile.Length > 0)
                 {
                     if (!IsValidImageExtension(imageFile.FileName))
@@ -145,6 +150,11 @@ namespace ExploreRussiaWebApp.Controllers
                         await imageFile.CopyToAsync(fileStream);
                     }
                     trip.ImageUrl = "/images/" + fileName;
+                }
+                else
+                {
+                    // Если файл изображения не был загружен, сохранить старое значение ImageUrl
+                    trip.ImageUrl = existingTrip.ImageUrl;
                 }
 
                 _context.Update(trip);

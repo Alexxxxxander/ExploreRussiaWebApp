@@ -4,27 +4,27 @@
     ViewData["Title"] = "Создание";
 }
 
-<h1>Создание</h1>
+<h1 class="text-center">@ViewData["Title"]</h1>
 
-<h4>Гид</h4>
+<h4 class="text-center">Гид</h4>
 <hr />
-<div class="row">
+<div class="row justify-content-center">
     @if (!ViewData.ModelState.IsValid)
-{
-    <div class="alert alert-danger">
-        <ul>
-            @foreach (var modelState in ViewData.ModelState.Values)
-            {
-                foreach (var error in modelState.Errors)
+    {
+        <div class="alert alert-danger col-md-6">
+            <ul>
+                @foreach (var modelState in ViewData.ModelState.Values)
                 {
-                    <li>@error.ErrorMessage</li>
+                    foreach (var error in modelState.Errors)
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
                 }
-            }
-        </ul>
-    </div>
-}
+            </ul>
+        </div>
+    }
 
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -59,24 +59,23 @@
             </div>
             <div class="form-group">
                 <label asp-for="GenderId" class="control-label"></label>
-                <select asp-for="GenderId" class ="form-control" asp-items="ViewBag.GenderId"></select>
+                <select asp-for="GenderId" class="form-control" asp-items="ViewBag.GenderId"></select>
                 <span asp-validation-for="GenderId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ImageUrl">Фотография</label>
-                <input type="file" asp-for="ImageUrl" class="form-control" />
+                <input type="file" asp-for="ImageUrl" class="form-control-file" />
             </div>
-            <div class="form-group" style="margin: 10px">
+            <div class="form-group text-center">
                 <button type="submit" class="btn btn-primary">Создать</button>
+                <a asp-action="EditList" class="btn btn-secondary">Назад к списку</a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="EditList">Назад к списку</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

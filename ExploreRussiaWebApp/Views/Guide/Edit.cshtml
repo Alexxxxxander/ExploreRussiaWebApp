@@ -8,8 +8,8 @@
 
 <h4>Гид</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="row justify-content-center">
+    <div class="col-md-6">
         <form asp-action="Edit" asp-controller="Guide" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
@@ -54,18 +54,18 @@
                 {
                     <img src="@Url.Content(Model.ImageUrl)" alt="Current Image" class="img-thumbnail" />
                 }
-                <input type="file" asp-for="ImageUrl" />
+                <input type="file" asp-for="ImageUrl" class="form-control" />
             </div>
             <div class="form-group" style="margin: 10px">
                 
-                <button type="submit">Сохранить</button>
+                <button type="submit" class="btn btn-sm btn-primary">Сохранить</button>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="EditList">Назад к списку</a>
+    <a asp-action="EditList" class="btn btn-sm btn-secondary">Назад к списку</a>
 </div>
 
 @section Scripts {

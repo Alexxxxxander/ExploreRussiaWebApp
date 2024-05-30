@@ -5,12 +5,11 @@
 
 <h1>Админ панель</h1>
 
-<p>Добро пожаловать!</p>
 
-<a asp-controller="Guide" asp-action="EditList" class="btn btn-secondary">Manage Guides</a>
-<a asp-controller="Trip" asp-action="Index" class="btn btn-secondary">Manage Trips</a>
+<a asp-controller="Guide" asp-action="EditList" class="btn btn-secondary">Управление гидами</a>
+<a asp-controller="Trip" asp-action="Index" class="btn btn-secondary">Управление походами</a>
 
-<h2>Заказы</h2>
+<h2 style="margin-top: 30px">Заявки</h2>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -32,7 +31,18 @@
                 <td>@order.Trip.TripName</td>
                 <td>@order.TotalAmount.ToString("C")</td>
                 <td>
-                    <a asp-action="EditOrder" asp-route-id="@order.Id" class="btn btn-primary">Изменить цену</a>
+                    <a asp-action="EditOrder" asp-route-id="@order.Id" class="btn btn-primary btn-group btn-group-vertical">Изменить цену</a>
+                    @{
+                        if (order.Status == "Confirmed")
+                        {
+                            <a asp-action="EndOrder" asp-route-id="@order.Id" class="btn btn-danger btn-group btn-group-vertical">Завершить</a>
+                        }
+                        if(order.Status == "Pending")
+                        {
+                            <a asp-action="ConfirmOrder" asp-route-id="@order.Id" class="btn btn-success btn-group btn-group-vertical">Подтвердить</a>
+                        }
+                    }
+                   
                 </td>
             </tr>
         }
