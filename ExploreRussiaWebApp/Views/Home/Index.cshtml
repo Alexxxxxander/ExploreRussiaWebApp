@@ -13,6 +13,7 @@
 </script>
 
 
+
 <div class="jumbotron jumbotron-fluid text-center" style="background: url('/images/hero.jpg') no-repeat center center; background-size: cover;">
     <div class="container">
         <h1 class="display-4">Добро пожаловать в Explore Russia</h1>
@@ -86,7 +87,14 @@
         {
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
-                    <img src="@trip.ImageUrl" class="card-img-top" alt="@trip.TripName">
+                    @if (!string.IsNullOrEmpty(trip.ImageUrl))
+                    {
+                        <img src="@trip.ImageUrl" class="card-img-top" alt="@trip.TripName">
+                    }
+                    else
+                    {
+                        <div class="card-img-top" style="background-color: lightgray"></div>
+                    }
                     <div class="card-body">
                         <h4 class="card-title">@trip.TripName</h4>
                         <p class="card-text">@trip.Description</p>
@@ -132,4 +140,5 @@
         <h2>О нас</h2>
         <p>Компания Explore Russia специализируется на организации туров по самым красивым и интересным местам России. Мы предлагаем уникальные маршруты, профессиональных гидов и незабываемые впечатления.</p>
     </div>
+
 

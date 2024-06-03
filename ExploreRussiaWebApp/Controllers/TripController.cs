@@ -57,18 +57,11 @@ namespace ExploreRussiaWebApp.Controllers
             return View();
         }
 
-        private bool IsValidImageExtension(string fileName)
-        {
-            var allowedExtensions = new[] { ".jpg", ".jpeg" };
-            string extension = Path.GetExtension(fileName).ToLowerInvariant();
-            return allowedExtensions.Contains(extension);
-        }
-
         // POST: Trip/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile imageFile)
+        public async Task<IActionResult> Create([Bind("TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
             {
@@ -81,7 +74,7 @@ namespace ExploreRussiaWebApp.Controllers
                         return View(trip);
                     }
 
-                    var id = await _context.Trips.MaxAsync(g => (int?)g.Id) ?? 0 + 1;
+                    var id = await _context.Trips.MaxAsync(g => (int?)g.Id) ?? 0 + 2;
                     var fileName = "trip" + id + Path.GetExtension(imageFile.FileName);
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -119,7 +112,7 @@ namespace ExploreRussiaWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId,ImageUrl")] Trip trip, IFormFile imageFile)
+        public async Task<IActionResult> Edit(int? id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId,ImageUrl")] Trip trip, IFormFile? imageFile)
         {
             if (id != trip.Id)
             {
@@ -157,13 +150,35 @@ namespace ExploreRussiaWebApp.Controllers
                     trip.ImageUrl = existingTrip.ImageUrl;
                 }
 
-                _context.Update(trip);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Update(trip);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Trips.Any(t => t.Id == id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
             ViewData["GuideId"] = new SelectList(_context.Guides, "Id", "Email", trip.GuideId);
             return View(trip);
         }
+
+        private bool IsValidImageExtension(string fileName)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg" };
+            var extension = Path.GetExtension(fileName)?.ToLower();
+            return allowedExtensions.Contains(extension);
+        }
+
 
 
 

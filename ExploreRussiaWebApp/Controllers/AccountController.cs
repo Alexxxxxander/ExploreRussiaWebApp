@@ -57,6 +57,7 @@ namespace ExploreRussiaWebApp.Controllers
             }
             return View(model);
         }
+
         /// <summary>
         /// Метод возвращает Id текущего пользователя
         /// </summary>

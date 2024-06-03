@@ -7,8 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ExploreRussia.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
-namespace ExploreRussiaWebApp.Views
+namespace ExploreRussiaWebApp.Controllers
 {
     public class GuideController : Controller
     {
@@ -65,6 +68,21 @@ namespace ExploreRussiaWebApp.Views
             return allowedExtensions.Contains(extension);
         }
 
+        private string ProcessUploadedFile(IFormFile uploadedFile, int guideId)
+        {
+            if (uploadedFile != null && uploadedFile.Length > 0)
+            {
+                var fileName = "guide" + guideId + Path.GetExtension(uploadedFile.FileName);
+                var filePath = Path.Combine( "/images/", fileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    uploadedFile.CopyTo(fileStream);
+                }
+                return "/images/" + fileName;
+            }
+            return string.Empty;
+        }
+
         // POST: Guide/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -75,8 +93,6 @@ namespace ExploreRussiaWebApp.Views
         {
             if (ModelState.IsValid)
             {
-                ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
-
                 if (uploadedFile != null && uploadedFile.Length > 0)
                 {
                     if (!IsValidImageExtension(uploadedFile.FileName))
@@ -87,15 +103,8 @@ namespace ExploreRussiaWebApp.Views
                     }
 
                     var id = await _context.Guides.MaxAsync(g => (int?)g.Id) ?? 0 + 1;
-                    var fileName = "guide" + id + Path.GetExtension(uploadedFile.FileName);
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await uploadedFile.CopyToAsync(fileStream);
-                    }
-                    guide.ImageUrl = "/images/" + fileName;
+                    guide.ImageUrl = ProcessUploadedFile(uploadedFile, id);
                 }
-                ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
                 await _context.AddAsync(guide);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(EditList));
@@ -103,6 +112,7 @@ namespace ExploreRussiaWebApp.Views
             ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
             return View(guide);
         }
+
 
         // GET: Guide/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -127,7 +137,7 @@ namespace ExploreRussiaWebApp.Views
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,LastName,FirstName,Patronymic,Phone,Email,ExperienceYears,GenderId, Gender")] Guide guide, IFormFile uploadedFile)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,LastName,FirstName,Patronymic,Phone,Email,ExperienceYears,GenderId, Gender")] Guide guide, IFormFile? uploadedFile)
         {
             if (id != guide.Id)
             {
@@ -136,7 +146,7 @@ namespace ExploreRussiaWebApp.Views
 
             if (ModelState.IsValid)
             {
-                var existingGuide = await _context.Guides.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
+                var existingGuide = await _context.Guides.FirstOrDefaultAsync(g => g.Id == id);
                 if (existingGuide == null)
                 {
                     return NotFound();
@@ -151,13 +161,7 @@ namespace ExploreRussiaWebApp.Views
                         return View(guide);
                     }
 
-                    var fileName = "guide" + guide.Id + Path.GetExtension(uploadedFile.FileName);
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await uploadedFile.CopyToAsync(fileStream);
-                    }
-                    guide.ImageUrl = "/images/" + fileName;
+                    guide.ImageUrl = ProcessUploadedFile(uploadedFile, guide.Id);
                 }
                 else
                 {
@@ -172,7 +176,6 @@ namespace ExploreRussiaWebApp.Views
             ViewData["GenderId"] = new SelectList(_context.Genders, "Id", "Name", guide.GenderId);
             return View(guide);
         }
-
 
         // GET: Guide/Delete/5
         public async Task<IActionResult> Delete(int? id)
