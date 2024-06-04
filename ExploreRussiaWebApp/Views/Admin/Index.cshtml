@@ -35,11 +35,17 @@
                     @{
                         if (order.Status == "Confirmed")
                         {
-                            <a asp-action="EndOrder" asp-route-id="@order.Id" class="btn btn-danger btn-group btn-group-vertical">Завершить</a>
+                            <form asp-action="EndOrder" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                                <input type="hidden" value="@order.Id" name="id" />
+                                <button action="sumbit" class="btn btn-danger btn-group btn-group-vertical">Завершить</button>
+                             </form>
                         }
                         if(order.Status == "Pending")
                         {
-                            <a asp-action="ConfirmOrder" asp-route-id="@order.Id" class="btn btn-success btn-group btn-group-vertical">Подтвердить</a>
+                            <form asp-action="ConfirmOrder" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                                <input type="hidden" value="@order.Id" name="id"/>
+                                <button action="sumbit" class="btn btn-success btn-group btn-group-vertical">Подтвердить</button>
+                            </form>
                         }
                     }
                    

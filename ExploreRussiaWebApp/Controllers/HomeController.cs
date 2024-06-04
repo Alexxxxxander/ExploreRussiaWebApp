@@ -77,9 +77,30 @@ namespace ExploreRussiaWebApp.Controllers
             return RedirectToAction("UserProfile");
         }
 
+        [Authorize]
+        [ValidateAntiForgeryToken]
         [HttpPost]
-        public async Task<IActionResult> SumbitReview(Review review)
+        public async Task<IActionResult> SubmitReview(int rating, string? comment, int tripId, int userId)
         {
+            var existingReview = await exploreRussiaContext.Reviews.Where(x => x.TripId == tripId && x.UserId == userId).FirstOrDefaultAsync();
+            if (existingReview != null)
+            {
+                TempData["ReviewAlready"] = "Вы уже оставляляли отзыв на этот поход";
+                return RedirectToAction("UserProfile");
+            }
+
+                Review review = new Review()
+                {
+                    Rating = rating,
+                    Comment = comment,
+                    TripId = tripId,
+                    UserId = userId,
+                    ReviewDate = DateTime.Now
+                };
+                TempData["SubmitSuccess"] = "Отзыв успешно добавлен";
+                await exploreRussiaContext.AddAsync(review);
+                await exploreRussiaContext.SaveChangesAsync();
+            
             return RedirectToAction("UserProfile");
         }
 
@@ -104,6 +125,7 @@ namespace ExploreRussiaWebApp.Controllers
         public async Task<IActionResult> BookTrip(int tripId)
         {
             var user = await exploreRussiaContext.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
+            var trip = await exploreRussiaContext.Trips.FirstOrDefaultAsync(u => u.Id == tripId);
 
             if (user == null || string.IsNullOrEmpty(user.Phone) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.LastName))
             {
@@ -123,13 +145,15 @@ namespace ExploreRussiaWebApp.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+
             // Пользователь уже имеет необходимую информацию, переходим к созданию заказа
             Order order = new()
             {
                 UserId = user.Id,
                 TripId = tripId,
                 OrderDate = DateTime.UtcNow,
-                TotalAmount = 0m
+                TotalAmount = trip.Price.HasValue ? (decimal)trip.Price : 0,
+                Status = "Pending"
             };
 
             await exploreRussiaContext.Orders.AddAsync(order);

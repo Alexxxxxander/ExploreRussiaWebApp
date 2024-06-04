@@ -67,6 +67,28 @@ namespace ExploreRussiaWebApp.Controllers
             return RedirectToAction("Index", "Admin");
         }
 
+        [HttpPost]
+        [Authorize(Roles ="Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmOrder(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            order.Status = "Confirmed";
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Admin");
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EndOrder(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            order.Status = "Finished";
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "Admin");
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "Admin")]

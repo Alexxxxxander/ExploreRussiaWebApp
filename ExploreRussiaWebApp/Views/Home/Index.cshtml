@@ -11,6 +11,9 @@
         toursElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 </script>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
 
 
 
@@ -109,20 +112,21 @@
                         </p>
                         <div class="rating">
                             @{
-                                var fullStars = (int)trip.AverageRating;
-                                var halfStar = trip.AverageRating - fullStars >= 0.5;
+                                var avgRating = trip.Reviews.Any() ? trip.Reviews.Where(x => x.TripId == trip.Id).Average(x => x.Rating) : 1;
+                                var fullStars = (int)avgRating;
+                                var halfStar = avgRating - fullStars >= 0.5;
                             }
                             @for (int i = 0; i < fullStars; i++)
                             {
-                                <span class="fa fa-star checked"></span>
+                                <span class="fa fa-star"></span>
                             }
                             @if (halfStar)
                             {
-                                <span class="fa fa-star-half-alt checked"></span>
+                                <span class="fa fa-star-half-alt"></span>
                             }
                             @for (int i = fullStars + (halfStar ? 1 : 0); i < 5; i++)
                             {
-                                <span class="fa fa-star"></span>
+                                <span class="fa fa-star-o"></span> 
                             }
                         </div>
                         <form asp-action="BookTrip" method="post">
