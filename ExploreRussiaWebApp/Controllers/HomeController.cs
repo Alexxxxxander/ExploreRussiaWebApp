@@ -27,7 +27,7 @@ namespace ExploreRussiaWebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var guides = await exploreRussiaContext.Guides.ToListAsync();
-            var trips = await exploreRussiaContext.Trips.ToListAsync();
+            var trips = await exploreRussiaContext.Trips.Include( x => x.Reviews).ToListAsync();
             var model = new HomeViewModel(guides, trips);
               
             return View(model);

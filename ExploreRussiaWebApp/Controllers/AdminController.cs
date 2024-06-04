@@ -89,6 +89,22 @@ namespace ExploreRussiaWebApp.Controllers
             return RedirectToAction("Index", "Admin");
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteOrder(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order != null)
+            {
+                _context.Orders.Remove(order);
+            }
+
+            await _context.SaveChangesAsync();
+        
+            return RedirectToAction("Index", "Admin");
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
