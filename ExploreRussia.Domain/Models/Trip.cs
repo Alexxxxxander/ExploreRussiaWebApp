@@ -23,6 +23,8 @@ public partial class Trip
 
     public string? ImageUrl { get; set; }
 
+    public bool? IsActual { get; set; }
+
     public virtual Guide? Guide { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
