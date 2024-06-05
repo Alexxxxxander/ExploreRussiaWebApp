@@ -83,7 +83,7 @@
     <div class="container mt-5 tours">
         <h1 class="text-center mb-4">Доступные походы</h1>
         <div class="row">
-            @foreach (var trip in Model.Trip)
+            @foreach (var trip in Model.Trip.Where(x=>x.IsActual == true))
         {
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
