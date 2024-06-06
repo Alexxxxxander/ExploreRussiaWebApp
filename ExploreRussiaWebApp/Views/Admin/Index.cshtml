@@ -5,11 +5,31 @@
 
 <h1>Админ панель</h1>
 
-
 <a asp-controller="Guide" asp-action="EditList" class="btn btn-secondary">Управление гидами</a>
 <a asp-controller="Trip" asp-action="Index" class="btn btn-secondary">Управление походами</a>
 
 <h2 style="margin-top: 30px">Заявки</h2>
+
+<div class="admin-search-container">
+    <input type="text" id="searchName" placeholder="Поиск по ФИО..." onkeyup="filterOrders()">
+    <select id="tripFilter" onchange="filterOrders()">
+        <option value="">Все походы</option>
+        @foreach (var trip in Model.Select(o => o.Trip.TripName).Distinct())
+        {
+            <option value="@trip">@trip</option>
+        }
+    </select>
+    <input type="number" id="priceFrom" placeholder="Цена от..." onkeyup="filterOrders()" onchange="filterOrders()">
+    <input type="number" id="priceTo" placeholder="Цена до..." onkeyup="filterOrders()" onchange="filterOrders()">
+    <select id="statusFilter" onchange="filterOrders()">
+        <option value="">Все статусы</option>
+        <option value="Pending">В ожидании</option>
+        <option value="Confirmed">Подтверждено</option>
+        <option value="Canceled">Отменено</option>
+        <option value="Finished">Завершено</option>
+    </select>
+</div>
+
 <table class="table table-striped">
     <thead>
         <tr>
@@ -22,10 +42,10 @@
             <th>Действия</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="ordersTable">
         @foreach (var order in Model)
         {
-            <tr>
+            <tr class="admin-order-item" data-name="@order.User.LastName @order.User.FirstName @order.User.Patronymic" data-trip="@order.Trip.TripName" data-price="@order.TotalAmount" data-status="@order.Status">
                 <td>@order.User.LastName @order.User.FirstName @order.User.Patronymic</td>
                 <td>@order.User.Phone</td>
                 <td>@order.User.Email</td>
@@ -34,31 +54,75 @@
                 <td>@order.Status</td>
                 <td>
                     <div class="d-flex justify-content-between">
-                        <a asp-action="EditOrder" asp-route-id="@order.Id" class="btn btn-primary btn-group btn-group-vertical">Изменить цену</a>
                         @{
                             if (order.Status == "Confirmed")
                             {
                                 <form asp-action="EndOrder" asp-controller="Admin" method="post" enctype="multipart/form-data">
                                     <input type="hidden" value="@order.Id" name="id" />
-                                    <button action="sumbit" class="btn btn-danger btn-group btn-group-vertical">Завершить</button>
-                                 </form>
-                            }
-                            if(order.Status == "Pending")
-                            {
-                                <form asp-action="ConfirmOrder" asp-controller="Admin" method="post" enctype="multipart/form-data">
-                                    <input type="hidden" value="@order.Id" name="id"/>
-                                    <button action="sumbit" class="btn btn-success btn-group btn-group-vertical">Подтвердить</button>
+                                    <button type="submit" class="btn btn-danger btn-group btn-group-horizontal">Завершить</button>
                                 </form>
                             }
-                            <form asp-action="DeleteOrder" asp-controller="Admin" method="post" enctype="multipart/form-data">
-                                <input type="hidden" value="@order.Id" name="id"/>
-                                <input type="submit" value="Удалить" class="btn btn-danger btn-group btn-group-vertical" /> |
-                            </form>                           
+                            if (order.Status == "Pending")
+                            {
+                                <form asp-action="ConfirmOrder" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" value="@order.Id" name="id" />
+                                    <button type="submit" class="btn btn-success btn-group btn-group-horizontal">Подтвердить</button>
+                                </form>
+                            }
+                            if (order.Status != "Canceled" && order.Status != "Finished")
+                            {
+                                <form asp-action="DeleteOrder" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" value="@order.Id" name="id" />
+                                    <input type="submit" value="Отменить" class="btn btn-danger btn-group btn-group-horizontal" />
+                                </form>
+                            }
                         }
                     </div>
-                   
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<script>
+    function filterOrders() {
+        const searchName = document.getElementById('searchName').value.toLowerCase();
+        const tripFilter = document.getElementById('tripFilter').value;
+        const priceFrom = parseFloat(document.getElementById('priceFrom').value);
+        const priceTo = parseFloat(document.getElementById('priceTo').value);
+        const statusFilter = document.getElementById('statusFilter').value;
+
+        const orders = document.querySelectorAll('.admin-order-item');
+
+        orders.forEach(order => {
+            const name = order.getAttribute('data-name').toLowerCase();
+            const trip = order.getAttribute('data-trip');
+            const price = parseFloat(order.getAttribute('data-price'));
+            const status = order.getAttribute('data-status');
+
+            let isVisible = true;
+
+            if (searchName && !name.includes(searchName)) {
+                isVisible = false;
+            }
+
+            if (tripFilter && trip !== tripFilter) {
+                isVisible = false;
+            }
+
+            if (!isNaN(priceFrom) && price < priceFrom) {
+                isVisible = false;
+            }
+
+            if (!isNaN(priceTo) && price > priceTo) {
+                isVisible = false;
+            }
+
+            if (statusFilter && status !== statusFilter) {
+                isVisible = false;
+            }
+
+            order.style.display = isVisible ? '' : 'none';
+        });
+    }
+</script>

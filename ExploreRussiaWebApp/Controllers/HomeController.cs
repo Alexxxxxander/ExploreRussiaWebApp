@@ -8,7 +8,6 @@ using System.Security.Claims;
 using ExploreRussiaWebApp.Models.Home;
 using System;
 
-
 namespace ExploreRussiaWebApp.Controllers
 {
     public class HomeController : Controller
@@ -27,9 +26,9 @@ namespace ExploreRussiaWebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var guides = await exploreRussiaContext.Guides.ToListAsync();
-            var trips = await exploreRussiaContext.Trips.Include( x => x.Reviews).ToListAsync();
+            var trips = await exploreRussiaContext.Trips.Include(x => x.Reviews).ToListAsync();
             var model = new HomeViewModel(guides, trips);
-              
+
             return View(model);
         }
 
@@ -49,7 +48,61 @@ namespace ExploreRussiaWebApp.Controllers
         }
 
         [Authorize]
-        public async  Task<IActionResult> UserProfile(User model) 
+        [HttpGet]
+        public async Task<IActionResult> BookTrip(int tripId)
+        {
+            var trip = await exploreRussiaContext.Trips.FirstOrDefaultAsync(t => t.Id == tripId);
+            if (trip == null)
+            {
+                return NotFound();
+            }
+
+            return View(trip);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmBooking(int tripId, int participantsQty)
+        {
+            var user = await exploreRussiaContext.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
+            var trip = await exploreRussiaContext.Trips.FirstOrDefaultAsync(u => u.Id == tripId);
+
+            if (user == null || string.IsNullOrEmpty(user.Phone) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.LastName))
+            {
+                return RedirectToAction("FillUserInfo", "Account");
+            }
+
+            var today = DateTime.UtcNow.Date;
+            var existingOrder = await exploreRussiaContext.Orders
+                .Where(o => o.UserId == user.Id && o.TripId == tripId && o.OrderDate.Date == today)
+                .FirstOrDefaultAsync();
+
+            if (existingOrder != null)
+            {
+                TempData["OrderError"] = "Вы уже подали заявку на этот поход сегодня.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            Order order = new()
+            {
+                UserId = user.Id,
+                TripId = tripId,
+                OrderDate = DateTime.UtcNow,
+                TotalAmount = (trip.Price.HasValue ? (decimal)trip.Price : 0) * participantsQty,
+                ParicipansQty = participantsQty,
+                Status = "Pending"
+            };
+
+            await exploreRussiaContext.Orders.AddAsync(order);
+            await exploreRussiaContext.SaveChangesAsync();
+
+            TempData["OrderSuccess"] = "Заявка успешно отправлена.";
+            return RedirectToAction("Index", "Home");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> UserProfile()
         {
             var userId = GetCurrentUserId();
             var user = await exploreRussiaContext.Users.Include(u => u.Orders)
@@ -58,11 +111,10 @@ namespace ExploreRussiaWebApp.Controllers
             return View(user);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(User model)
         {
-            var userId = GetCurrentUserId;
+            var userId = GetCurrentUserId();
             var user = await exploreRussiaContext.Users.FindAsync(userId);
             if (user != null)
             {
@@ -85,22 +137,22 @@ namespace ExploreRussiaWebApp.Controllers
             var existingReview = await exploreRussiaContext.Reviews.Where(x => x.TripId == tripId && x.UserId == userId).FirstOrDefaultAsync();
             if (existingReview != null)
             {
-                TempData["ReviewAlready"] = "Вы уже оставляляли отзыв на этот поход";
+                TempData["ReviewAlready"] = "Вы уже оставляли отзыв на этот поход";
                 return RedirectToAction("UserProfile");
             }
 
-                Review review = new Review()
-                {
-                    Rating = rating,
-                    Comment = comment,
-                    TripId = tripId,
-                    UserId = userId,
-                    ReviewDate = DateTime.Now
-                };
-                TempData["SubmitSuccess"] = "Отзыв успешно добавлен";
-                await exploreRussiaContext.AddAsync(review);
-                await exploreRussiaContext.SaveChangesAsync();
-            
+            Review review = new Review()
+            {
+                Rating = rating,
+                Comment = comment,
+                TripId = tripId,
+                UserId = userId,
+                ReviewDate = DateTime.Now
+            };
+            TempData["SubmitSuccess"] = "Отзыв успешно добавлен";
+            await exploreRussiaContext.AddAsync(review);
+            await exploreRussiaContext.SaveChangesAsync();
+
             return RedirectToAction("UserProfile");
         }
 
@@ -116,64 +168,10 @@ namespace ExploreRussiaWebApp.Controllers
             return RedirectToAction("UserProfile");
         }
 
-
-
-
-        [HttpPost]
-        [Authorize]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BookTrip(int tripId)
-        {
-            var user = await exploreRussiaContext.Users.FirstOrDefaultAsync(u => u.Id == GetCurrentUserId());
-            var trip = await exploreRussiaContext.Trips.FirstOrDefaultAsync(u => u.Id == tripId);
-
-            if (user == null || string.IsNullOrEmpty(user.Phone) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.LastName))
-            {
-                // Перенаправить пользователя на страницу заполнения информации о пользователе
-                return RedirectToAction("FillUserInfo", "Account");
-            }
-
-            // Проверяем, есть ли уже заявка на этот поход, сделанная сегодня
-            var today = DateTime.UtcNow.Date;
-            var existingOrder = await exploreRussiaContext.Orders
-                .Where(o => o.UserId == user.Id && o.TripId == tripId && o.OrderDate.Date == today)
-                .FirstOrDefaultAsync();
-
-            if (existingOrder != null)
-            {
-                TempData["OrderError"] = "Вы уже подали заявку на этот поход сегодня.";
-                return RedirectToAction("Index", "Home");
-            }
-
-
-            // Пользователь уже имеет необходимую информацию, переходим к созданию заказа
-            Order order = new()
-            {
-                UserId = user.Id,
-                TripId = tripId,
-                OrderDate = DateTime.UtcNow,
-                TotalAmount = trip.Price.HasValue ? (decimal)trip.Price : 0,
-                Status = "Pending"
-            };
-
-            await exploreRussiaContext.Orders.AddAsync(order);
-            await exploreRussiaContext.SaveChangesAsync();
-
-            TempData["OrderSuccess"] = "Заявка успешно отправлена.";
-            return RedirectToAction("Index", "Home");
-        }
-
-        // Метод для получения ID текущего пользователя
         private int GetCurrentUserId()
         {
             var userIdClaim = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
             return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -31,41 +31,7 @@ namespace ExploreRussiaWebApp.Controllers
                 
             return View(trips);
         }
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditOrder(int id)
-        {
-            var order = await _context.Orders
-                .Include(o => o.User)
-                .Include(o => o.Trip)
-                .FirstOrDefaultAsync(o => o.Id == id);
 
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            return View(order);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditOrder(int id, decimal totalAmount)
-        {
-            var order = await _context.Orders.FindAsync(id);
-
-            if (order == null)
-            {
-                return NotFound();
-            }
-
-            order.TotalAmount = totalAmount;
-            await _context.SaveChangesAsync();
-
-            TempData["OrderUpdated"] = "Стоимость заказа успешно обновлена.";
-            return RedirectToAction("Index", "Admin");
-        }
 
         [HttpPost]
         [Authorize(Roles ="Admin")]
@@ -95,10 +61,8 @@ namespace ExploreRussiaWebApp.Controllers
         public async Task<IActionResult> DeleteOrder(int id)
         {
             var order = await _context.Orders.FindAsync(id);
-            if (order != null)
-            {
-                _context.Orders.Remove(order);
-            }
+
+            order.Status = "Canceled";
 
             await _context.SaveChangesAsync();
         

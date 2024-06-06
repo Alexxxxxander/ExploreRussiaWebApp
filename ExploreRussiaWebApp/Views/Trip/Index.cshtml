@@ -10,6 +10,19 @@
     <a asp-action="Create" class="btn btn-primary">Создать новый поход</a>
 </div>
 
+<div class="trip-search-container">
+    <input type="text" id="tripSearchName" placeholder="Поиск по названию..." onkeyup="filterTrips()">
+    <input type="number" id="tripPriceFrom" placeholder="Цена от..." onkeyup="filterTrips()" onchange="filterTrips()">
+    <input type="number" id="tripPriceTo" placeholder="Цена до..." onkeyup="filterTrips()" onchange="filterTrips()">
+    <input type="date" id="tripStartDate" placeholder="Дата начала от..." onkeyup="filterTrips()" onchange="filterTrips()">
+    <input type="date" id="tripEndDate" placeholder="Дата окончания до..." onkeyup="filterTrips()" onchange="filterTrips()">
+    <select id="tripIsActual" onchange="filterTrips()">
+        <option value="">Все</option>
+        <option value="true">Актуальные</option>
+        <option value="false">Неактуальные</option>
+    </select>
+</div>
+
 <table class="table table-striped table-bordered">
     <thead class="thead-dark">
         <tr>
@@ -19,13 +32,14 @@
             <th>Дата начала</th>
             <th>Дата окончания</th>
             <th>Изображение</th>
+            <th>Актуальность</th>
             <th>Действия</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="tripsTable">
         @foreach (var item in Model)
         {
-            <tr>
+            <tr class="trip-item" data-name="@item.TripName" data-price="@item.Price" data-startdate="@item.StartDate?.ToString("yyyy-MM-dd")" data-enddate="@item.EndDate?.ToString("yyyy-MM-dd")" data-isactual="@item.IsActual.ToString().ToLower()">
                 <td>@Html.DisplayFor(modelItem => item.TripName)</td>
                 <td>@Html.DisplayFor(modelItem => item.Description)</td>
                 <td>@string.Format("{0:C}", item.Price)</td>
@@ -35,13 +49,102 @@
                     <img src="@item.ImageUrl" alt="@item.TripName" class="img-thumbnail" style="max-width: 100px;" />
                 </td>
                 <td>
+                    @if (item.IsActual)
+                    {
+                        <i class="fas fa-check text-success"></i>
+                    }
+                    else
+                    {
+                        <i class="fas fa-times text-danger"></i>
+                    }
+                </td>
+                <td>
                     <div class="d-flex justify-content-between">
                         <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-secondary mx-1">Редактировать</a>
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-secondary mx-1">Детали</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-secondary mx-1">Удалить</a>
                     </div>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<script>
+    function filterTrips() {
+        const searchName = document.getElementById('tripSearchName').value.toLowerCase();
+        const priceFrom = parseFloat(document.getElementById('tripPriceFrom').value);
+        const priceTo = parseFloat(document.getElementById('tripPriceTo').value);
+        const startDate = document.getElementById('tripStartDate').value;
+        const endDate = document.getElementById('tripEndDate').value;
+        const isActual = document.getElementById('tripIsActual').value;
+
+        const trips = document.querySelectorAll('.trip-item');
+
+        trips.forEach(trip => {
+            const name = trip.getAttribute('data-name').toLowerCase();
+            const price = parseFloat(trip.getAttribute('data-price'));
+            const tripStartDate = trip.getAttribute('data-startdate');
+            const tripEndDate = trip.getAttribute('data-enddate');
+            const actual = trip.getAttribute('data-isactual') === 'true';
+
+            let isVisible = true;
+
+            if (searchName && !name.includes(searchName)) {
+                isVisible = false;
+            }
+
+            if (!isNaN(priceFrom) && price < priceFrom) {
+                isVisible = false;
+            }
+
+            if (!isNaN(priceTo) && price > priceTo) {
+                isVisible = false;
+            }
+
+            if (startDate && tripStartDate < startDate) {
+                isVisible = false;
+            }
+
+            if (endDate && tripEndDate > endDate) {
+                isVisible = false;
+            }
+
+            if (isActual) {
+                if (isActual === 'true' && !actual) {
+                    isVisible = false;
+                } else if (isActual === 'false' && actual) {
+                    isVisible = false;
+                }
+            }
+
+            trip.style.display = isVisible ? '' : 'none';
+        });
+    }
+</script>
+
+<style>
+    .trip-search-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+        .trip-search-container input[type="text"],
+        .trip-search-container input[type="number"],
+        .trip-search-container input[type="date"],
+        .trip-search-container select {
+            padding: 12px 20px;
+            border: 2px solid #0d6efd;
+            border-radius: 50px;
+            outline: none;
+            font-size: 16px;
+            flex: 1;
+        }
+
+            .trip-search-container input[type="text"]::placeholder,
+            .trip-search-container input[type="number"]::placeholder,
+            .trip-search-container input[type="date"]::placeholder {
+                color: #999;
+            }
+</style>

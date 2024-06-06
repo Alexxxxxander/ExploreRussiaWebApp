@@ -1,60 +1,86 @@
 ﻿@model ExploreRussia.Domain.Models.Guide
 
 @{
-    ViewData["Title"] = "Детали";
+    ViewData["Title"] = "Детали гида";
 }
 
-<h1>Детали</h1>
+<h1 class="text-center">@ViewData["Title"]</h1>
 
-<div>
-    <h4>Гид</h4>
+<div class="details-container">
+    <h4 class="text-center">Гид</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
+    <dl class="row justify-content-center">
+        <dt class="col-sm-3 text-right">
+            Фамилия
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9 text-left">
             @Html.DisplayFor(model => model.LastName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
+        <dt class="col-sm-3 text-right">
+            Имя
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9 text-left">
             @Html.DisplayFor(model => model.FirstName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Patronymic)
+        <dt class="col-sm-3 text-right">
+            Отчество
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9 text-left">
             @Html.DisplayFor(model => model.Patronymic)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Phone)
+        <dt class="col-sm-3 text-right">
+            Email
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9 text-left">
             @Html.DisplayFor(model => model.Email)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ExperienceYears)
+        <dt class="col-sm-3 text-right">
+            Телефон
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-9 text-left">
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+        <dt class="col-sm-3 text-right">
+            Опыт работы
+        </dt>
+        <dd class="col-sm-9 text-left">
             @Html.DisplayFor(model => model.ExperienceYears)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Gender)
+        <dt class="col-sm-3 text-right">
+            Изображение
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Gender.Name)
+        <dd class="col-sm-9 text-left">
+            <img src="@Model.ImageUrl" alt="@Model.FirstName @Model.LastName" class="img-thumbnail" style="max-width: 100px;" />
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Редактировать</a> |
-    <a asp-action="EditList">Назад к списку</a>
+<div class="text-center">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Редактировать</a>
+    <a asp-action="EditList" class="btn btn-secondary">Назад к списку</a>
 </div>
+
+<style>
+    .details-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+        .details-container dt {
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .details-container dd {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        .details-container .img-thumbnail {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .details-container .text-center {
+            margin-top: 20px;
+        }
+</style>

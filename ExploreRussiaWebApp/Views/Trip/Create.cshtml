@@ -11,7 +11,6 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
             <div class="form-group">
                 <label asp-for="TripName" class="control-label"></label>
                 <input asp-for="TripName" class="form-control" />
@@ -19,44 +18,43 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control"></textarea>
+                <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                <input asp-for="Price" class="form-control" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="StartDate" class="control-label"></label>
-                <input asp-for="StartDate" class="form-control" type="date" />
+                <input asp-for="StartDate" class="form-control" />
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" type="date" />
+                <input asp-for="EndDate" class="form-control" />
                 <span asp-validation-for="EndDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" type="number" step="0.01" />
-                <span asp-validation-for="Price" class="text-danger"></span>
+                <label asp-for="ImageUrl" class="control-label">Изображение</label>
+                <input type="file" asp-for="ImageUrl" class="form-control" />
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="MaxParticipants" class="control-label"></label>
-                <input asp-for="MaxParticipants" class="form-control" type="number" />
-                <span asp-validation-for="MaxParticipants" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label for="imageFile" class="control-label">Изображение</label>
-                <input type="file" id="imageFile" name="imageFile" class="form-control-file" />
-            </div>
-            <div class="form-group">
-                <label asp-for="GuideId" class="control-label"></label>
-                <select asp-for="GuideId" class="form-control" asp-items="ViewBag.GuideId"></select>
-                <span asp-validation-for="GuideId" class="text-danger"></span>
+            <div class="form-group form-check">
+                <input type="checkbox" asp-for="IsActual" class="form-check-input" />
+                <label asp-for="IsActual" class="form-check-label">Актуальность</label>
+                <span asp-validation-for="IsActual" class="text-danger"></span>
             </div>
             <div class="form-group text-center">
                 <input type="submit" value="Создать" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Назад к списку</a>
             </div>
         </form>
     </div>
+</div>
+
+<div class="text-center">
+    <a asp-action="Index">Назад к списку</a>
 </div>
 
 @section Scripts {

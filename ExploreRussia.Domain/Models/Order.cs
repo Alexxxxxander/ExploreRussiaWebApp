@@ -17,6 +17,8 @@ public partial class Order
 
     public string? Status { get; set; }
 
+    public int? ParicipansQty { get; set; }
+
     public virtual Trip Trip { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;

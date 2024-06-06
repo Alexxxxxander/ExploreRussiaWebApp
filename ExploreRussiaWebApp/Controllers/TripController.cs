@@ -57,11 +57,10 @@ namespace ExploreRussiaWebApp.Controllers
             return View();
         }
 
-        // POST: Trip/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId")] Trip trip, IFormFile? imageFile)
+        public async Task<IActionResult> Create([Bind("TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId,IsActual")] Trip trip, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
             {
@@ -112,7 +111,7 @@ namespace ExploreRussiaWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int? id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId,ImageUrl")] Trip trip, IFormFile? imageFile)
+        public async Task<IActionResult> Edit(int? id, [Bind("Id,TripName,Description,StartDate,EndDate,Price,MaxParticipants,GuideId,ImageUrl,IsActual")] Trip trip, IFormFile? imageFile)
         {
             if (id != trip.Id)
             {
@@ -145,8 +144,7 @@ namespace ExploreRussiaWebApp.Controllers
                     trip.ImageUrl = "/images/" + fileName;
                 }
                 else
-                {
-                    // Если файл изображения не был загружен, сохранить старое значение ImageUrl
+                {                    
                     trip.ImageUrl = existingTrip.ImageUrl;
                 }
 
@@ -172,6 +170,7 @@ namespace ExploreRussiaWebApp.Controllers
             return View(trip);
         }
 
+
         private bool IsValidImageExtension(string fileName)
         {
             var allowedExtensions = new[] { ".jpg", ".jpeg" };
@@ -180,41 +179,6 @@ namespace ExploreRussiaWebApp.Controllers
         }
 
 
-
-
-        // GET: Trip/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var trip = await _context.Trips
-                .Include(t => t.Guide)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (trip == null)
-            {
-                return NotFound();
-            }
-
-            return View(trip);
-        }
-
-        // POST: Trip/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var trip = await _context.Trips.FindAsync(id);
-            if (trip != null)
-            {
-                _context.Trips.Remove(trip);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
         private bool TripExists(int id)
         {

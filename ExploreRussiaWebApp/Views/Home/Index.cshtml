@@ -64,7 +64,7 @@
 <script>
     $(document).ready(function () {
         $('.carousel').carousel({
-            interval: 2000
+            interval: 4000
         });
 
         // Включение прокрутки колесом мыши
@@ -80,62 +80,84 @@
     });
 </script>
 
+<script>
+    function filterTrips() {
+        const searchTerm = document.getElementById('searchTerm').value.toLowerCase();
+        const trips = document.querySelectorAll('.trip-item');
+
+        trips.forEach(trip => {
+            const tripName = trip.getAttribute('data-tripname').toLowerCase();
+            const description = trip.getAttribute('data-description').toLowerCase();
+
+            if (tripName.includes(searchTerm) || description.includes(searchTerm)) {
+                trip.style.display = 'block';
+            } else {
+                trip.style.display = 'none';
+            }
+        });
+    }
+</script>
+
+
     <div class="container mt-5 tours">
         <h1 class="text-center mb-4">Доступные походы</h1>
-        <div class="row">
-            @foreach (var trip in Model.Trip.Where(x=>x.IsActual == true))
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    @if (!string.IsNullOrEmpty(trip.ImageUrl))
-                    {
-                        <img src="@trip.ImageUrl" class="card-img-top" alt="@trip.TripName">
-                    }
-                    else
-                    {
-                        <div class="card-img-top" style="background-color: lightgray"></div>
-                    }
-                    <div class="card-body">
-                        <h4 class="card-title">@trip.TripName</h4>
-                        <p class="card-text">@trip.Description</p>
-                        <p class="card-text">
-                            <strong>Цена:</strong> @string.Format(CultureInfo.InvariantCulture, "{0:C}", trip.Price)
-                        </p>
-                        <p class="card-text">
-                            <strong>Дата начала:</strong> @trip?.StartDate.Value.ToShortDateString()
-                        </p>
-                        <p class="card-text">
-                            <strong>Дата конца:</strong> @trip?.EndDate.Value.ToShortDateString()
-                        </p>
-                        <div class="rating">
-                            @{
-                                var averageRating = trip.AverageRating;
-                                var avgRating = trip.Reviews.Any() ? trip.Reviews.Where(x => x.TripId == trip.Id).Average(x => x.Rating) : 1;
-                                var fullStars = (int)averageRating;
-                                var halfStar = avgRating - fullStars >= 0.5;
-                            }
-                            @for (int i = 0; i < fullStars; i++)
-                            {
-                                <span class="fa fa-star"></span>
-                            }
-                            @if (halfStar)
-                            {
-                                <span class="fa fa-star-half-alt"></span>
-                            }
-                            @for (int i = fullStars + (halfStar ? 1 : 0); i < 5; i++)
-                            {
-                                <span class="fa fa-star-o"></span> 
-                            }
+    <div class="search-container">
+        <input type="text" id="searchTerm" placeholder="Поиск по названию..." onkeyup="filterTrips()">
+        <i class="fas fa-search"></i>
+    </div>
+
+    <div class="results-container" id="resultsContainer">
+        <div class="row" id="tripsContainer">
+            @foreach (var trip in Model.Trip.Where(x => x.IsActual == true))
+            {
+                <div class="col-md-4 mb-4 trip-item" data-tripname="@trip.TripName" data-description="@trip.Description">
+                    <div class="card h-100">
+                        @if (!string.IsNullOrEmpty(trip.ImageUrl))
+                        {
+                            <img src="@trip.ImageUrl" class="card-img-top" alt="@trip.TripName">
+                        }
+                        else
+                        {
+                            <div class="card-img-top" style="background-color: lightgray"></div>
+                        }
+                        <div class="card-body">
+                            <h4 class="card-title">@trip.TripName</h4>
+                            <p class="card-text">@trip.Description</p>
+                            <p class="card-text">
+                                <strong>Цена:</strong>  @trip.Price.Value.ToString("C")
+                            </p>
+                            <p class="card-text">
+                                <strong>Дата начала:</strong> @trip?.StartDate.Value.ToShortDateString()
+                            </p>
+                            <p class="card-text">
+                                <strong>Дата конца:</strong> @trip?.EndDate.Value.ToShortDateString()
+                            </p>
+                            <div class="rating">
+                                @{
+                                    var averageRating = trip.AverageRating;
+                                    var fullStars = (int)averageRating;
+                                    var halfStar = averageRating - fullStars >= 0.5;
+                                }
+                                @for (int i = 0; i < fullStars; i++)
+                                {
+                                    <span class="fa fa-star"></span>
+                                }
+                                @if (halfStar)
+                                {
+                                    <span class="fa fa-star-half-alt"></span>
+                                }
+                                @for (int i = fullStars + (halfStar ? 1 : 0); i < 5; i++)
+                                {
+                                    <span class="fa fa-star-o"></span>
+                                }
+                            </div>
+                            <a asp-action="BookTrip" asp-route-tripId="@trip.Id" class="btn btn-primary">Купить место</a>
                         </div>
-                        <form asp-action="BookTrip" method="post">
-                            <input type="hidden" name="tripId" value="@trip.Id" />
-                            <button type="submit" class="btn btn-primary">Купить место</button>
-                        </form>
                     </div>
                 </div>
-            </div>
-        }
+            }
         </div>
+    </div>
     </div>
 
     <div class="container mt-5">

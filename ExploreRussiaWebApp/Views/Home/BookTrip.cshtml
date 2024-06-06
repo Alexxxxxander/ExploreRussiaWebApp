@@ -1,0 +1,54 @@
+﻿@model ExploreRussia.Domain.Models.Trip
+
+@{
+    ViewData["Title"] = "Оформление заявки";
+}
+
+<div class="container mt-5" style="max-width: 800px; margin:0 auto;">
+    <h2 class="text-center">Оформление заявки</h2>
+    <div class="card h-100">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" class="card-img-top" alt="@Model.TripName">
+        }
+        else
+        {
+            <div class="card-img-top" style="background-color: lightgray"></div>
+        }
+        <div class="card-body">
+            <h4 class="card-title">@Model.TripName</h4>
+            <p class="card-text">@Model.Description</p>
+            <p class="card-text">
+                <strong>Цена:</strong> @Model.Price.Value.ToString("C")
+            </p>
+            <p class="card-text">
+                <strong>Дата начала:</strong> @Model?.StartDate.Value.ToShortDateString()
+            </p>
+            <p class="card-text">
+                <strong>Дата конца:</strong> @Model?.EndDate.Value.ToShortDateString()
+            </p>
+            <form asp-action="ConfirmBooking" method="post">
+                <div class="form-group">
+                    <label for="participantsQty">Количество участников:</label>
+                    <input type="number" class="form-control" id="participantsQty" name="participantsQty" min="1" value="1" />
+                </div>
+                <input type="hidden" name="tripId" value="@Model.Id" />
+                <button type="submit" class="btn btn-primary">Оформить заявку</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-img-top {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+</style>
