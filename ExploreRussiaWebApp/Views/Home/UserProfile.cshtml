@@ -118,5 +118,48 @@
             modal.style.display = 'none';
         }
     }
+
+    function filterOrders() {
+        const searchValue = document.getElementById('orderSearch').value.toLowerCase();
+        const statusValue = document.getElementById('orderStatusFilter').value;
+
+        const orders = document.querySelectorAll('.order-item');
+
+        orders.forEach(order => {
+            const tripName = order.getAttribute('data-tripname').toLowerCase();
+            const status = order.getAttribute('data-status');
+
+            let isVisible = true;
+
+            if (searchValue && !tripName.includes(searchValue)) {
+                isVisible = false;
+            }
+
+            if (statusValue && status !== statusValue) {
+                isVisible = false;
+            }
+
+            order.style.display = isVisible ? '' : 'none';
+        });
+    }
+
+    function updateOrderTotal(orderId, participantsQty) {
+        fetch(`/Home/UpdateOrderParticipantsQty`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+            },
+            body: JSON.stringify({ orderId, participantsQty })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Ошибка при обновлении количества участников');
+                }
+            });
+    }
 </script>
 
